@@ -1,0 +1,83 @@
+===============
+Liquidb
+===============
+
+Liquidb is a Django app that simplifies migration management.
+It introduces commits (savepoints) that allows developer to take snapshot of current migration state of whole Django project.
+Commits introduce abstraction layer, which let you easily switch back and forth in complicated migration graph of dependent apps.
+In order to roll(back/forward) all migrations should be revertable.
+
+
+
+Requirements
+============
+
+Django Liquidb requires Django 3.1 or later and Python 3.6 or later.
+
+
+Getting It
+==========
+
+You can get Django Liquidb by using pip::
+
+    $ pip install django-liquidb
+
+If you want to install it from source, grab the git repository from GitHub and run setup.py::
+
+    $ git clone git@github.com:Gusakovskiy/django-liquidb.git
+    $ cd django-liquidb
+    $ python setup.py install
+
+
+
+Quick start
+-----------
+
+1. Add "Liquidb" to your INSTALLED_APPS setting like this::
+
+    INSTALLED_APPS = [
+        ...
+        'liquidb',
+    ]
+
+
+2. Run ``python manage.py migrate liquidb`` to create the liquidb models.
+3. Create initial commit ``python manage.py snapshot_migration_state --name init``
+
+Using It
+-----------
+
+Create snapshot of your current state
+
+    $ python manage.py snapshot_migration_state --name state_name
+
+Return to desired state of db:
+
+    $ python manage.py checkout_to_savepoint --name state_name
+
+Return to latest snapshot:
+
+    $ python manage.py checkout_to_latest_snapshot
+
+If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch:
+
+    $ python manage.py delete_snapshot_history
+
+
+
+Getting Involved
+================
+
+Open Source projects can always use more help. Fixing a problem, documenting a feature, adding
+translation in your language. If you have some time to spare and like to help us, here are the places to do so:
+
+- GitHub: https://github.com/Gusakovskiy/django-liquidb
+
+Support
+=======
+
+Django Liquidb is development and maintained by developers in an Open Source manner.
+Any support is welcome. You could help by writing documentation, pull-requests, report issues and/or translations.
+
+Please remember that nobody is paid directly to develop or maintain Django Liquidb so we do have to divide our time
+between putting food on the table, family, this project and the rest of life.

@@ -1,0 +1,19 @@
+*.swp
+*.pyc
+*~.nib/
+build/
+dist/
+*.egg-info/
+
+# PyCharm
+.idea/*
+events/.idea/
+pytestdebug.log
+.pytest_cache
+.pytest_cache/*
+__pycache__/
+
+# osx noise
+.DS_Store
+.cache
+.cache/*
