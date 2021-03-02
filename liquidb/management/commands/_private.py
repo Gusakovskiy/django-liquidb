@@ -6,10 +6,8 @@ from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState
-from django.db.models import Max
 
-from ..consts import SELF_NAME
-from ...models import Snapshot, MigrationState, create_migration_hash
+from ...models import Snapshot, MigrationState, get_latest_applied_migrations_qs
 
 
 class BaseLiquidbCommand(BaseCommand):
@@ -17,10 +15,10 @@ class BaseLiquidbCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.connection = connection
-        self.recorder = MigrationRecorder(self.connection )
 
     def _check_migration_db_exists(self):
-        if not self.recorder.has_table():
+        recorder = MigrationRecorder(self.connection)
+        if not recorder.has_table():
             self.stderr.write('No migration table present')
             sys.exit(2)
 
@@ -36,10 +34,6 @@ class BaseLiquidbCommand(BaseCommand):
         self._check_migration_db_exists()
         self._check_liquidb_tables_exists()
 
-    @property
-    def migration_qs(self):
-        return self.recorder.migration_qs.exclude(app=SELF_NAME)
-
     def _handle(self, *args, **options):
         raise NotImplemented('Override this method')
 
@@ -48,13 +42,7 @@ class BaseLiquidbCommand(BaseCommand):
         self._handle(*args, **options)
 
     def _latest_migrations(self):
-        lastest_ids = self.migration_qs.values('app').annotate(
-            latest_id=Max('id')
-        ).values_list(
-            'latest_id',
-            flat=True,
-        )
-        return self.migration_qs.filter(id__in=lastest_ids)
+        return get_latest_applied_migrations_qs(self.connection)
 
 
 class BaseLiquidbRevertCommand(BaseLiquidbCommand):
@@ -81,16 +69,14 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
 
     def _checkout_snapshot(self, snapshot: Snapshot, force=False):
         latest = self.get_latest_applied()
-        current_migration_state = self._latest_migrations().values_list('app', 'name')
-        current_state = create_migration_hash(current_migration_state)
-        inconsistent_state = current_state != latest.migration_hash
-        if inconsistent_state and not force:
+        consistent_with_migration_table = latest.consistent_state
+        if not consistent_with_migration_table and not force:
             self.stderr.write(
                 f'Migration state is inconsistent latest applied snapshot do not has all currently applied migrations. '
                 f'Please use --force flag to checkout anyway.'
             )
             sys.exit(2)
-        if inconsistent_state:
+        if not consistent_with_migration_table:
             self.stdout.write('Force to apply migration. Unsaved changes will be dropped')
 
         if snapshot.id > latest.id:
@@ -114,5 +100,13 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
             # update state that all previous transactions unaplied
             Snapshot.objects.filter(id__gt=snapshot.id).update(applied=False)
         else:
-            self._revert_to_snapshot(snapshot)
+            # eq is not same as equal snapshot.id == latest.id
+            if snapshot == latest:
+                # migration hashes are the same
+                # nothing to do
+                self.stdout(f'Snapshot already applied {latest.name}')
+                sys.exit(0)
+            else:
+                # should happen ?
+                self._revert_to_snapshot(snapshot)
         self.stdout(f'Checkout from snapshot {latest.name} to {snapshot.name}')

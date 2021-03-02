@@ -1,7 +1,5 @@
 import sys
 
-from django.db.models import Max
-
 from ._private import BaseLiquidbCommand
 from ...models import Snapshot, MigrationState
 
@@ -22,6 +20,10 @@ class Command(BaseLiquidbCommand):
         if exists:
             self.stderr.write('Snapshot with given name already exists')
             sys.exit(2)
+        latest = Snapshot.objects.filter(applied=True).first()
+        if latest is not None and latest.consistent_state:
+            self.stderr.write('All migrations saved in previous applied snapshot. Nothing to create')
+            sys.exit(1)
         snapshot = Snapshot(name=commit_name)
         snapshot.save()
         migrations = self._latest_migrations().only('id', 'app', 'name')
