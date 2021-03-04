@@ -3,13 +3,13 @@ from typing import Tuple, List
 
 from django.db import models, connection
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.models import Max
+from django.db.models import Max, Index, Q
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from uuid import uuid4
 
-from liquidb.management.consts import SELF_NAME
+from liquidb.consts import SELF_NAME
 
 
 def _generate_commit_name():
@@ -44,7 +44,14 @@ def get_latest_applied_migrations_qs(connection_obj=None) -> MigrationRecorder.M
 class Snapshot(models.Model):
     name = models.TextField(default=_generate_commit_name, db_index=True, unique=True)
     created = models.DateTimeField(default=now)
-    applied = models.BooleanField(default=True)
+    applied = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            # by default all applied is false
+            # only one row can be applied at the time
+            Index(fields=['applied'], name='unique_applied', condition=Q(applied=True))
+        ]
 
     def __repr__(self):
         class_name = self.__class__.__name__

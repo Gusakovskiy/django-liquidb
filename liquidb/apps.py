@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from .management.consts import SELF_NAME
+from liquidb.consts import SELF_NAME
 
 
 class LiquidbDjangoConfig(AppConfig):

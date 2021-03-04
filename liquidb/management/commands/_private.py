@@ -2,7 +2,7 @@ import sys
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState
@@ -47,10 +47,7 @@ class BaseLiquidbCommand(BaseCommand):
 
 class BaseLiquidbRevertCommand(BaseLiquidbCommand):
 
-    def _snapshot_exists(self, from_id, to_id, state):
-        return Snapshot.objects.filter(id__gt=from_id, id__lt=to_id, applied=state).exists()
-
-    def get_latest_applied(self):
+    def get_applied_snapshot(self):
         try:
             latest = Snapshot.objects.filter(applied=True).latest('id')
         except ObjectDoesNotExist as e:
@@ -62,13 +59,14 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
         targets = snapshot.migrations.values_list('app', 'name')
         if not targets:
             # snapshot that do not have any migrations
-            self.stderr.write(f'Empty target version for snapshot {snapshot.name}')
+            # TODO get all apps from django apps and migrate everything to zero ?
+            self.stderr.write(f'No connected migrations found for snapshot {snapshot.name}')
             sys.exit(2)
         executor = MigrationExecutor(self.connection)
         _: ProjectState = executor.migrate(targets)
 
     def _checkout_snapshot(self, snapshot: Snapshot, force=False):
-        latest = self.get_latest_applied()
+        latest = self.get_applied_snapshot()
         consistent_with_migration_table = latest.consistent_state
         if not consistent_with_migration_table and not force:
             self.stderr.write(
@@ -79,34 +77,19 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
         if not consistent_with_migration_table:
             self.stdout.write('Force to apply migration. Unsaved changes will be dropped')
 
-        if snapshot.id > latest.id:
-            from_id = latest.id
-            to_id = snapshot.id
-            if self._snapshot_exists(from_id, to_id, True):
-                self.stderr.write(f'Inconsistent history; Applied snapshots exists between {from_id} and {to_id}')
-                sys.exit(2)
-            # to the future
-            self._revert_to_snapshot(snapshot)
-            # update state that all previous transactions applied
-            Snapshot.objects.filter(id__lte=snapshot.id).update(applied=True)
-        elif snapshot.id < latest.id:
-            from_id = snapshot.id
-            to_id = latest.id
-            if self._snapshot_exists(from_id, to_id, False):
-                self.stderr.write(f'Inconsistent history; Applied snapshots exists between {from_id} and {to_id}')
-                sys.exit(2)
-            # back to the future
-            self._revert_to_snapshot(snapshot)
-            # update state that all previous transactions unaplied
-            Snapshot.objects.filter(id__gt=snapshot.id).update(applied=False)
-        else:
-            # eq is not same as equal snapshot.id == latest.id
-            if snapshot == latest:
-                # migration hashes are the same
-                # nothing to do
-                self.stdout(f'Snapshot already applied {latest.name}')
-                sys.exit(0)
-            else:
-                # should happen ?
-                self._revert_to_snapshot(snapshot)
-        self.stdout(f'Checkout from snapshot {latest.name} to {snapshot.name}')
+        # eq is not same as equal snapshot.id == latest.id
+        # see liquidb.models.Snapshot.__eq__
+        if snapshot == latest:
+            # migration hashes are the same
+            # nothing to do
+            self.stdout.write(f'Snapshot already applied {latest.name}')
+            sys.exit(0)
+        self._revert_to_snapshot(snapshot)
+        with transaction.atomic():
+            latest.applied = False
+            latest.save(update_fields=['applied'])
+
+            snapshot.applied = True
+            snapshot.save(update_fields=['applied'])
+
+        self.stdout.write(f'Checkout from snapshot {latest.name} to {snapshot.name}')

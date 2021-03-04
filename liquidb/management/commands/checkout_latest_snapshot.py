@@ -8,11 +8,12 @@ class Command(BaseLiquidbRevertCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '--force',
-            type=bool,
-            default=False,
+            type=int,
+            default=0,
+            choices=[0, 1],
             help='Drop unsaved changes',
         )
 
     def _handle(self, *args, **options):
         snapshot = Snapshot.objects.latest('id')
-        self._checkout_snapshot(snapshot, force=options['force'])
+        self._checkout_snapshot(snapshot, force=bool(options['force']))

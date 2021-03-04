@@ -4,7 +4,7 @@ Liquidb
 
 Liquidb is a Django app that simplifies migration management.
 It introduces commits (savepoints) that allows developer to take snapshot of current migration state of whole Django project.
-Commits introduce abstraction layer, which let you easily switch back and forth in complicated migration graph of dependent apps.
+Snapshot introduces abstraction layer, which let you easily switch back and forth in complicated migration graph of dependent apps.
 In order to roll(back/forward) all migrations should be revertable.
 
 
@@ -12,7 +12,9 @@ In order to roll(back/forward) all migrations should be revertable.
 Requirements
 ============
 
-Django Liquidb requires Django 3.1 or later and Python 3.6 or later.
+Django Liquidb requires:
+    * Django 2.2 or later;
+    * Python 3.6 or later.
 
 
 Getting It
@@ -42,22 +44,23 @@ Quick start
 
 
 2. Run ``python manage.py migrate liquidb`` to create the liquidb models.
-3. Create initial commit ``python manage.py snapshot_migration_state --name init``
+3. Create initial commit ``python manage.py create_migration_snapshot --name init``
 
 Using It
 -----------
 
 Create snapshot of your current state
-
-    $ python manage.py snapshot_migration_state --name state_name
+    $ branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+    $ hash=$(git rev-parse $branch)
+    $ python manage.py create_migration_snapshot --name $branch-${hash:0:8}
 
 Return to desired state of db:
 
-    $ python manage.py checkout_to_savepoint --name state_name
+    $ python manage.py checkout_snapshot --name state_name
 
 Return to latest snapshot:
 
-    $ python manage.py checkout_to_latest_snapshot
+    $ python manage.py checkout_latest_snapshot
 
 If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch:
 
