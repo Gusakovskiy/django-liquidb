@@ -1,7 +1,7 @@
 import sys
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.db import connection, transaction
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.recorder import MigrationRecorder
@@ -19,8 +19,7 @@ class BaseLiquidbCommand(BaseCommand):
     def _check_migration_db_exists(self):
         recorder = MigrationRecorder(self.connection)
         if not recorder.has_table():
-            self.stderr.write('No migration table present')
-            sys.exit(2)
+            raise CommandError('No migration table present')
 
     def _check_liquidb_tables_exists(self):
         with self.connection.cursor() as cursor:
@@ -51,8 +50,7 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
         try:
             latest = Snapshot.objects.filter(applied=True).latest('id')
         except ObjectDoesNotExist as e:
-            self.stderr.write('No latest snapshot present; {!r}'.format(e))
-            sys.exit(2)
+            raise CommandError('No latest snapshot present') from e
         return latest
 
     def _revert_to_snapshot(self, snapshot: Snapshot):
@@ -60,20 +58,36 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
         if not targets:
             # snapshot that do not have any migrations
             # TODO get all apps from django apps and migrate everything to zero ?
-            self.stderr.write(f'No connected migrations found for snapshot {snapshot.name}')
-            sys.exit(2)
+            raise CommandError(
+                f'No connected migrations found for snapshot {snapshot.name}'
+            )
         executor = MigrationExecutor(self.connection)
-        _: ProjectState = executor.migrate(targets)
+        try:
+            _: ProjectState = executor.migrate(targets)
+        except KeyError:
+            message = (
+                '\n'.join(
+                    [
+                        f'* App Name: {app} ; Migration: {migration}'
+                        for app, migration in targets
+                    ]
+                )
+            )
+            raise CommandError(
+                f'\nSome migrations are missing.\n'
+                f'Please make sure all migrations in snapshot: "{snapshot.name}";\n'
+                f'Are present in corresponding apps: \n{message}'
+            )
 
     def _checkout_snapshot(self, snapshot: Snapshot, force=False):
         latest = self.get_applied_snapshot()
         consistent_with_migration_table = latest.consistent_state
         if not consistent_with_migration_table and not force:
-            self.stderr.write(
-                f'Migration state is inconsistent latest applied snapshot do not has all currently applied migrations. '
-                f'Please use --force flag to checkout anyway.'
+            raise CommandError(
+                'Migration state is inconsistent latest applied '
+                'snapshot do not has all currently applied migrations. '
+                'Please use --force flag to checkout anyway.'
             )
-            sys.exit(2)
         if not consistent_with_migration_table:
             self.stdout.write('Force to apply migration. Unsaved changes will be dropped')
 

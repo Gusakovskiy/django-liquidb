@@ -10,3 +10,4 @@ DATABASES = {
         'NAME': ':memory:'
     }
 }
+USE_TZ = True

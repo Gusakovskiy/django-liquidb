@@ -49,23 +49,24 @@ Quick start
 Using It
 -----------
 
-Create snapshot of your current state
+Create snapshot of your current state::
+
     $ branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
     $ hash=$(git rev-parse $branch)
     $ python manage.py create_migration_snapshot --name $branch-${hash:0:8}
 
-Return to desired state of db:
+
+Return to desired state of db::
 
     $ python manage.py checkout_snapshot --name state_name
 
-Return to latest snapshot:
+Return to latest snapshot::
 
     $ python manage.py checkout_latest_snapshot
 
-If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch:
+If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch::
 
     $ python manage.py delete_snapshot_history
-
 
 
 Getting Involved
