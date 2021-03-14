@@ -40,19 +40,47 @@ def test_create_snapshot(apps, create_migration_state_fixture):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'silent', [True, False]
+    'overwrite', [0, 1]
 )
-def test_snapshot_already_exist(create_migration_state_fixture, silent):
+def test_snapshot_with_same_name_state_is_not_changed(create_migration_state_fixture, overwrite):
     apps = [('first_app', '0001'), ('second_app', '0005')]
     snapshot_name = 'first'
     create_migration_state_fixture(apps)
     call_command('create_migration_snapshot', name=snapshot_name)
-    if not silent:
+    if not overwrite:
         with pytest.raises(CommandError):
-            call_command('create_migration_snapshot', name=snapshot_name, silent=silent)
+            call_command('create_migration_snapshot', name=snapshot_name, overwrite=overwrite)
     else:
         with pytest.raises(SystemExit):
-            call_command('create_migration_snapshot', name=snapshot_name, silent=silent)
+            call_command('create_migration_snapshot', name=snapshot_name, overwrite=overwrite)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'overwrite', [0, 1]
+)
+def test_snapshot_with_same_name_state_is_changed(create_migration_state_fixture, overwrite):
+    snapshot_name = 'stable'
+    state_1 = [('first_app', '0001'), ('second_app', '0005')]
+    create_migration_state_fixture(state_1)
+    call_command('create_migration_snapshot', name=snapshot_name)
+    state_2 = [('first_app', '0002'), ('second_app', '0003'), ('third_app', '0006')]
+    create_migration_state_fixture(state_2)
+    if not overwrite:
+        with pytest.raises(CommandError):
+            call_command('create_migration_snapshot', name=snapshot_name, overwrite=overwrite)
+    else:
+        call_command('create_migration_snapshot', name=snapshot_name, overwrite=overwrite)
+        snapshot = Snapshot.objects.get(name=snapshot_name)
+        # check that snapshot overwritten
+        assert snapshot.consistent_state is True
+        expected_state = state_2
+        assert snapshot.migrations.count() == len(expected_state)
+        migrations = snapshot.migrations.all()
+        assert set(migrations.values_list('app', flat=True)) == set([app_name for app_name, _ in expected_state])
+        assert set(migrations.values_list('name', flat=True)) == set(
+            [migration_name for _, migration_name in expected_state]
+        )
 
 
 @pytest.mark.django_db

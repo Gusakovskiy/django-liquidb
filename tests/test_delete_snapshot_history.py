@@ -20,5 +20,5 @@ from liquidb.models import Snapshot
 def test_delete_snapshot_history(apps, create_migration_state_fixture):
     create_migration_state_fixture(apps)
     call_command('create_migration_snapshot', name='init')
-    call_command('delete_snapshot_history')
+    call_command('delete_snapshot_history', interactive=False)
     assert Snapshot.objects.count() == 0

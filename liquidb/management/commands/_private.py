@@ -43,6 +43,13 @@ class BaseLiquidbCommand(BaseCommand):
     def _latest_migrations(self):
         return get_latest_applied_migrations_qs(self.connection)
 
+    def get_snapshot(self, name: str):
+        try:
+            snapshot = Snapshot.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            raise CommandError(f'Snapshot with name: "{name}" doesn\'t exists') from e
+        return snapshot
+
 
 class BaseLiquidbRevertCommand(BaseLiquidbCommand):
 
@@ -96,7 +103,7 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
         if snapshot == latest:
             # migration hashes are the same
             # nothing to do
-            self.stdout.write(f'Snapshot already applied {latest.name}')
+            self.stdout.write(f'Snapshot "{latest.name}" already applied ')
             sys.exit(0)
         self._revert_to_snapshot(snapshot)
         with transaction.atomic():
@@ -106,4 +113,4 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
             snapshot.applied = True
             snapshot.save(update_fields=['applied'])
 
-        self.stdout.write(f'Checkout from snapshot {latest.name} to {snapshot.name}')
+        self.stdout.write(f'Checkout from snapshot "{latest.name}" to "{snapshot.name}"')
