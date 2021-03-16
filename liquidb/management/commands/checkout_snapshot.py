@@ -1,9 +1,4 @@
-import sys
-
-from django.core.exceptions import ObjectDoesNotExist
-
 from ._private import BaseLiquidbRevertCommand
-from ...models import Snapshot
 
 
 class Command(BaseLiquidbRevertCommand):

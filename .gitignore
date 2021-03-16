@@ -6,6 +6,7 @@ dist/
 *.egg-info/
 venv/
 usefull_commands.sh
+.pypirc
 
 # PyCharm
 .idea/*

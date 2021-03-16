@@ -1,5 +1,6 @@
 import hashlib
 from typing import Tuple, List
+from uuid import uuid4
 
 from django.db import models, connection
 from django.db.migrations.recorder import MigrationRecorder
@@ -7,18 +8,19 @@ from django.db.models import Max, Index, Q
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from uuid import uuid4
 
 from liquidb.consts import SELF_NAME
 
 
-def _generate_commit_name():
+def _generate_commit_name() -> str:
+    """Generates commit name base on datetime"""
     date = now().strftime('%d-%m-%YT%H:%M:%S')
     salt = get_random_string(6)
     return f'{salt}_{date}'
 
 
 def _create_migration_hash(migration_identifiers: List[Tuple[str, str]]) -> str:
+    """create md5 out of tuples of [(app_name, migration_file), ...]"""
     separator = ';'
     inner_separator = '-'
     # always sort alphabetically to ensure same result for unsorted app and sorted
@@ -27,7 +29,8 @@ def _create_migration_hash(migration_identifiers: List[Tuple[str, str]]) -> str:
     return hashlib.md5(joined_value.encode('utf-8')).hexdigest()  # nosec  # NOQA
 
 
-def get_latest_applied_migrations_qs(connection_obj=None) -> MigrationRecorder.Migration.objects:
+def get_latest_applied_migrations_qs(connection_obj=None) -> 'QuerySet[MigrationRecorder.Migration]':
+    """Return latest applied migration in all django apps in project"""
     if connection_obj is None:
         connection_obj = connection
     recorder = MigrationRecorder(connection_obj)
@@ -67,12 +70,14 @@ class Snapshot(models.Model):
 
     @property
     def consistent_state(self) -> bool:
+        """Return True if all connected migrations to current snapshot is applied"""
         current_state = get_latest_applied_migrations_qs().values_list('app', 'name')
         current_hash = _create_migration_hash(current_state)
         return self.migration_hash == current_hash
 
     @cached_property
-    def migration_hash(self):
+    def migration_hash(self) -> str:
+        """Generate migration hash"""
         return _create_migration_hash(self.migrations.values_list('app', 'name'))
 
 

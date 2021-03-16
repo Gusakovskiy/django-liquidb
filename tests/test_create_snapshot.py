@@ -2,8 +2,9 @@ from io import StringIO
 
 import pytest
 from django.core.management import call_command, CommandError
-from liquidb.models import Snapshot
 from mock import patch
+
+from liquidb.models import Snapshot
 
 
 @pytest.mark.django_db
