@@ -13,7 +13,7 @@ class Command(BaseLiquidbRevertCommand):
         parser.add_argument(
             '--name',
             type=str,
-            help='More verbose name of commit (snapshot)',
+            help='Name of snapshot to apply',
         )
         parser.add_argument(
             '--force',
@@ -23,14 +23,6 @@ class Command(BaseLiquidbRevertCommand):
             help='Drop unsaved changes',
         )
 
-    def get_snapshots(self, name: str):
-        try:
-            snapshots = Snapshot.objects.get(name=name)
-        except ObjectDoesNotExist as e:
-            self.stderr.write('{!r}'.format(e))
-            sys.exit(2)
-        return snapshots
-
     def _handle(self, *args, **options):
-        snapshots = self.get_snapshots(options['name'])
-        self._checkout_snapshot(snapshots, force=bool(options['force']))
+        snapshot = self.get_snapshot(options['name'])
+        self._checkout_snapshot(snapshot, force=bool(options['force']))

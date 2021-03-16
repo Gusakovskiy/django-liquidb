@@ -4,6 +4,8 @@
 build/
 dist/
 *.egg-info/
+venv/
+usefull_commands.sh
 
 # PyCharm
 .idea/*
@@ -17,3 +19,4 @@ __pycache__/
 .DS_Store
 .cache
 .cache/*
+

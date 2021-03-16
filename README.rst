@@ -49,23 +49,33 @@ Quick start
 Using It
 -----------
 
-Create snapshot of your current state
+Create snapshot of your current state::
+
     $ branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
     $ hash=$(git rev-parse $branch)
     $ python manage.py create_migration_snapshot --name $branch-${hash:0:8}
 
-Return to desired state of db:
+In case you want to overwrite some snapshot::
+
+    $ python manage.py create_migration_snapshot --name $branch-${hash:0:8} --overwrite 1
+
+
+Return to desired state of db::
 
     $ python manage.py checkout_snapshot --name state_name
 
-Return to latest snapshot:
+Return to latest snapshot::
 
     $ python manage.py checkout_latest_snapshot
 
-If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch:
+If snapshot history is messed up you always can delete it without impact on your migration state and start from scratch::
 
     $ python manage.py delete_snapshot_history
 
+
+If want to delete only one snapshot(it can not delete currently applied snapshot remember to checkout before that)::
+
+    $ python manage.py delete_snapshot_by_name --name name
 
 
 Getting Involved
@@ -83,4 +93,4 @@ Django Liquidb is development and maintained by developers in an Open Source man
 Any support is welcome. You could help by writing documentation, pull-requests, report issues and/or translations.
 
 Please remember that nobody is paid directly to develop or maintain Django Liquidb so we do have to divide our time
-between putting food on the table, family, this project and the rest of life.
+between work/family/hobby/this project and the rest of life.
