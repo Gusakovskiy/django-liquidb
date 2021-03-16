@@ -1,5 +1,6 @@
 import hashlib
 from typing import Tuple, List
+from uuid import uuid4
 
 from django.db import models, connection
 from django.db.migrations.recorder import MigrationRecorder
@@ -7,7 +8,6 @@ from django.db.models import Max, Index, Q
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from uuid import uuid4
 
 from liquidb.consts import SELF_NAME
 

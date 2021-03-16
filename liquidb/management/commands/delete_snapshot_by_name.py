@@ -4,7 +4,6 @@ from django.core.management import CommandError
 from django.db import transaction
 
 from ._private import BaseLiquidbRevertCommand
-from ...models import Snapshot
 
 
 class Command(BaseLiquidbRevertCommand):
