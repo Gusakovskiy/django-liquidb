@@ -1,4 +1,5 @@
 import sys
+from abc import ABCMeta, abstractmethod
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandError
@@ -10,7 +11,7 @@ from django.db.migrations.state import ProjectState
 from ...models import Snapshot, MigrationState, get_latest_applied_migrations_qs
 
 
-class BaseLiquidbCommand(BaseCommand):
+class BaseLiquidbCommand(BaseCommand, metaclass=ABCMeta):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,9 +34,6 @@ class BaseLiquidbCommand(BaseCommand):
         self._check_migration_db_exists()
         self._check_liquidb_tables_exists()
 
-    def _handle(self, *args, **options):
-        raise NotImplemented('Override this method')
-
     def handle(self, *args, **options):
         self._init()
         self._handle(*args, **options)
@@ -43,24 +41,33 @@ class BaseLiquidbCommand(BaseCommand):
     def _latest_migrations(self):
         return get_latest_applied_migrations_qs(self.connection)
 
-    def get_snapshot(self, name: str):
+    @staticmethod
+    def get_snapshot(name: str) -> Snapshot:
+        """Retrun snapshot by name"""
         try:
             snapshot = Snapshot.objects.get(name=name)
-        except ObjectDoesNotExist as e:
-            raise CommandError(f'Snapshot with name: "{name}" doesn\'t exists') from e
+        except ObjectDoesNotExist as error:
+            raise CommandError(f'Snapshot with name: "{name}" doesn\'t exists') from error
         return snapshot
 
+    @abstractmethod
+    def _handle(self, *args, **options):
+        raise NotImplementedError
 
-class BaseLiquidbRevertCommand(BaseLiquidbCommand):
 
-    def get_applied_snapshot(self):
+class BaseLiquidbRevertCommand(BaseLiquidbCommand, metaclass=ABCMeta):
+
+    @staticmethod
+    def _get_applied_snapshot():
+        """Return latest applied snapshot by id"""
         try:
             latest = Snapshot.objects.filter(applied=True).latest('id')
-        except ObjectDoesNotExist as e:
-            raise CommandError('No latest snapshot present') from e
+        except ObjectDoesNotExist as error:
+            raise CommandError('No latest snapshot present') from error
         return latest
 
     def _revert_to_snapshot(self, snapshot: Snapshot):
+        """Revert db state to given snapshot"""
         targets = snapshot.migrations.values_list('app', 'name')
         if not targets:
             # snapshot that do not have any migrations
@@ -87,7 +94,8 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
             )
 
     def _checkout_snapshot(self, snapshot: Snapshot, force=False):
-        latest = self.get_applied_snapshot()
+        """Run all checks before reverting to desired state"""
+        latest = self._get_applied_snapshot()
         consistent_with_migration_table = latest.consistent_state
         if not consistent_with_migration_table and not force:
             raise CommandError(
@@ -114,3 +122,7 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand):
             snapshot.save(update_fields=['applied'])
 
         self.stdout.write(f'Checkout from snapshot "{latest.name}" to "{snapshot.name}"')
+
+    @abstractmethod
+    def _handle(self, *args, **options):
+        raise NotImplementedError

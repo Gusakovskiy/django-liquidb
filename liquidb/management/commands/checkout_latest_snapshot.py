@@ -20,6 +20,6 @@ class Command(BaseLiquidbRevertCommand):
     def _handle(self, *args, **options):
         try:
             snapshot = Snapshot.objects.latest('id')
-        except ObjectDoesNotExist as e:
-            raise CommandError('No latest snapshot present') from e
+        except ObjectDoesNotExist as error:
+            raise CommandError('No latest snapshot present') from error
         self._checkout_snapshot(snapshot, force=bool(options['force']))
