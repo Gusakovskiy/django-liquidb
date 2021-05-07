@@ -32,7 +32,6 @@ class Command(BaseLiquidbRevertCommand):
                 You have requested to delete snapshot "{name}" with all migrations connected to it.
                 This action is IRREVERSIBLE. 
                 Are you sure you want to do this?
-    
                 Type 'yes' to continue, or 'no' to cancel: """
             )
             if confirm != 'yes':

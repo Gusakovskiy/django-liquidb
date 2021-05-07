@@ -2,7 +2,7 @@ from django.db import connection, transaction
 from django.db.migrations.recorder import MigrationRecorder
 
 
-def change_state_mock(self, snapshot):  # pylint: disable=unused-argument
+def change_state_mock(self, snapshot, force=False):  # pylint: disable=unused-argument
     # unfortunately no other way that we can chane state in tests
     # without all migrations files and whole django machinery
     # so for this test we will mock this state

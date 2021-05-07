@@ -24,7 +24,7 @@ def _create_three_state_fixture(create_migration_state_fixture):
 @pytest.mark.django_db
 @patch.object(
     BaseLiquidbRevertCommand,
-    '_revert_to_snapshot',
+    '_checkout_snapshot',
     new=change_state_mock,
 )
 def test_checkout_between_snapshots(_create_three_state_fixture):
@@ -42,3 +42,6 @@ def test_checkout_between_snapshots(_create_three_state_fixture):
     call_command('checkout_snapshot', name=state_2)
     snapshot = Snapshot.objects.get(name=state_2)
     assert snapshot.consistent_state is True
+    # check that previous state not consistent
+    snapshot = Snapshot.objects.get(name=state_3)
+    assert snapshot.consistent_state is False
