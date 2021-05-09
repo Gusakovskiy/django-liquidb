@@ -62,10 +62,10 @@ class SnapshotAdminModelForm(ModelForm):
         pass
 
 
-class StateInline(admin.TabularInline):
+class StateInline(admin.StackedInline):
     model = MigrationState
     can_delete = False
-    extra = 0
+    fk_name = "snapshot"
 
     # <editor-fold desc="Should be always readonly">
     def has_add_permission(self, request, obj=None):
@@ -94,10 +94,9 @@ class SnapshotAdminView(ModelAdmin):
         "applied",
         "snapshot_actions",
     )
-    # TODO find out why tests failing
-    # inlines = [
-    #     StateInline,
-    # ]
+    inlines = [
+        StateInline,
+    ]
 
     # <editor-fold desc="Only View Permissions">
     # User should create and delete snapshots through cli
