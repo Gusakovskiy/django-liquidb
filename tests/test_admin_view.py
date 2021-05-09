@@ -13,6 +13,15 @@ def _reverse_snapshot_change(obj):
     return reverse("admin:liquidb_snapshot_change", args=(obj.pk,))
 
 
+def _inject_managment_form_values(data):
+    managment_form_data = {
+        "migrations-TOTAL_FORMS": 1,
+        "migrations-INITIAL_FORMS": 1,
+    }
+    data = {**data, **managment_form_data}
+    return data
+
+
 @pytest.fixture(scope="function")
 def create_two_snapshots_fixture(create_snapshot_fixture):
     apps_1 = [("first_app", "0001"), ("second_app", "0005")]
@@ -126,7 +135,9 @@ def test_create_init_snapshot(admin_client_fixture, create_migration_state_fixtu
     create_migration_state_fixture([("third_app", "0001"), ("five_app", "0005")])
     client = admin_client_fixture
     response = client.post(
-        reverse("admin:liquidb_snapshot_add"), {"name": name}, follow=True
+        reverse("admin:liquidb_snapshot_add"),
+        _inject_managment_form_values({"name": name}),
+        follow=True,
     )
     assert response.status_code == 200
     snapshot = Snapshot.objects.get(name=name)
@@ -143,7 +154,9 @@ def test_create_snapshot_with_existing(
     create_migration_state_fixture([("third_app", "0003"), ("five_app", "0006")])
     snapshot_name = "following"
     response = client.post(
-        reverse("admin:liquidb_snapshot_add"), {"name": snapshot_name}, follow=True
+        reverse("admin:liquidb_snapshot_add"),
+        _inject_managment_form_values({"name": snapshot_name}),
+        follow=True,
     )
     assert response.status_code == 200
     snapshot = Snapshot.objects.get(name=snapshot_name)
@@ -157,7 +170,9 @@ def test_existing_snapshot(admin_client_fixture, create_snapshot_fixture):
     create_snapshot_fixture([("third_app", "0001"), ("five_app", "0005")], name)
     client = admin_client_fixture
     response = client.post(
-        reverse("admin:liquidb_snapshot_add"), {"name": name}, follow=True
+        reverse("admin:liquidb_snapshot_add"),
+        _inject_managment_form_values({"name": name}),
+        follow=True,
     )
     soup = BeautifulSoup(response.rendered_content, "html.parser")
     errors = soup.find("ul", class_="errorlist nonfield")
@@ -169,7 +184,9 @@ def test_consistent_state_snapshot(admin_client_fixture, create_snapshot_fixture
     create_snapshot_fixture([("third_app", "0002"), ("five_app", "0005")], "init")
     client = admin_client_fixture
     response = client.post(
-        reverse("admin:liquidb_snapshot_add"), {"name": "second"}, follow=True
+        reverse("admin:liquidb_snapshot_add"),
+        _inject_managment_form_values({"name": "second"}),
+        follow=True,
     )
     soup = BeautifulSoup(response.rendered_content, "html.parser")
     errors = soup.find("ul", class_="errorlist nonfield")

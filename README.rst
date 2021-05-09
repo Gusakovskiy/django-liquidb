@@ -78,6 +78,11 @@ If want to delete only one snapshot(it can not delete currently applied snapshot
     $ python manage.py delete_snapshot_by_name --name name
 
 
+
+Or if you prefer admin vies you can always visit `/admin/liquidb/snapshot/` and create/apply/delete snapshot there.
+> If you would like to change to readonly view in admin please change ADMIN_SNAPSHOT_ACTIONS env variable to False or overwrite it you settings
+
+
 Getting Involved
 ================
 

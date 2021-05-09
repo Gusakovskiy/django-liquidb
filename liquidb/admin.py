@@ -13,7 +13,7 @@ from .db_tools import (
     SnapshotHandlerException,
     SnapshotCreationHandler,
 )
-from .models import Snapshot
+from .models import Snapshot, MigrationState
 from .settings import ADMIN_SNAPSHOT_ACTIONS
 
 
@@ -62,6 +62,24 @@ class SnapshotAdminModelForm(ModelForm):
         pass
 
 
+class StateInline(admin.StackedInline):
+    model = MigrationState
+    can_delete = False
+    fk_name = "snapshot"
+
+    # <editor-fold desc="Should be always readonly">
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    # </editor-fold>
+
+
 @admin.register(Snapshot)
 class SnapshotAdminView(ModelAdmin):
 
@@ -76,6 +94,9 @@ class SnapshotAdminView(ModelAdmin):
         "applied",
         "snapshot_actions",
     )
+    inlines = [
+        StateInline,
+    ]
 
     # <editor-fold desc="Only View Permissions">
     # User should create and delete snapshots through cli

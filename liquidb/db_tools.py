@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
+from django.db.migrations.exceptions import NodeNotFoundError
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.state import ProjectState
 
@@ -58,6 +59,8 @@ class SnapshotCheckoutHandler:
                 f'Please make sure all migrations in snapshot: "{snapshot.name}";\n'
                 f"Are present in corresponding apps: \n{message}"
             )
+        except NodeNotFoundError as error:
+            raise SnapshotHandlerException(error.message)
 
     @property
     def applied_snapshot_exists(self):
