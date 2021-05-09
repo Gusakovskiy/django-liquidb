@@ -11,35 +11,66 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='MigrationState',
+            name="MigrationState",
             fields=[
-                ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, primary_key=True, serialize=False, unique=True)),
-                ('migration_id', models.IntegerField(db_index=True)),
-                ('app', models.CharField(max_length=255)),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        db_index=True,
+                        default=uuid.uuid4,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("migration_id", models.IntegerField(db_index=True)),
+                ("app", models.CharField(max_length=255)),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='Snapshot',
+            name="Snapshot",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField(db_index=True, default=liquidb.models._generate_commit_name, unique=True)),
-                ('created', models.DateTimeField(default=django.utils.timezone.now)),
-                ('applied', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.TextField(
+                        db_index=True,
+                        default=liquidb.models._generate_commit_name,
+                        unique=True,
+                    ),
+                ),
+                ("created", models.DateTimeField(default=django.utils.timezone.now)),
+                ("applied", models.BooleanField(default=False)),
             ],
         ),
         migrations.AddIndex(
-            model_name='snapshot',
-            index=models.Index(condition=models.Q(applied=True), fields=['applied'], name='unique_applied'),
+            model_name="snapshot",
+            index=models.Index(
+                condition=models.Q(applied=True),
+                fields=["applied"],
+                name="unique_applied",
+            ),
         ),
         migrations.AddField(
-            model_name='migrationstate',
-            name='snapshot',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='migrations', to='liquidb.snapshot'),
+            model_name="migrationstate",
+            name="snapshot",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="migrations",
+                to="liquidb.snapshot",
+            ),
         ),
     ]

@@ -33,3 +33,6 @@ jobs:
     - name: Analyze with pylint
       run: |
         pylint --load-plugins pylint_django liquidb
+    - name: Analyze with black
+      run: |
+        black --check .
