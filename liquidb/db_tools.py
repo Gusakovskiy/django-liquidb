@@ -9,10 +9,10 @@ from liquidb.models import Snapshot, MigrationState, get_latest_applied_migratio
 class SnapshotHandlerException(Exception):
     def __init__(self, error):
         self.error = error
+        super().__init__()
 
 
 class SnapshotCheckoutHandler:
-
     def __init__(self, snapshot: Snapshot, output=None):
         self.snapshot = snapshot
         self.output = output
@@ -28,37 +28,35 @@ class SnapshotCheckoutHandler:
     def _get_lastest_applied_snapshot(self):
         """Return latest applied snapshot by id"""
         try:
-            latest = self._applied_queryset().latest('id')
+            latest = self._applied_queryset().latest("id")
         except ObjectDoesNotExist as error:
-            raise SnapshotHandlerException('No latest snapshot present') from error
+            raise SnapshotHandlerException("No latest snapshot present") from error
         return latest
 
     def _checkout_to_snapshot(self, snapshot: Snapshot):
         """Revert db state to given snapshot"""
-        targets = snapshot.migrations.values_list('app', 'name')
+        targets = snapshot.migrations.values_list("app", "name")
         if not targets:
             # snapshot that do not have any migrations
             # TODO get all apps from django apps and migrate everything to zero ?
             raise SnapshotHandlerException(
-                f'No connected migrations found for snapshot {snapshot.name}'
+                f"No connected migrations found for snapshot {snapshot.name}"
             )
         executor = MigrationExecutor(connection)
         try:
             _: ProjectState = executor.migrate(targets)
         except KeyError:
             # TODO check exact migration that missing
-            message = (
-                '\n'.join(
-                    [
-                        f'* App Name: {app} ; Migration: {migration}'
-                        for app, migration in targets
-                    ]
-                )
+            message = "\n".join(
+                [
+                    f"* App Name: {app} ; Migration: {migration}"
+                    for app, migration in targets
+                ]
             )
             raise SnapshotHandlerException(
-                f'\nSome migrations are missing.\n'
+                f"\nSome migrations are missing.\n"
                 f'Please make sure all migrations in snapshot: "{snapshot.name}";\n'
-                f'Are present in corresponding apps: \n{message}'
+                f"Are present in corresponding apps: \n{message}"
             )
 
     @property
@@ -70,12 +68,14 @@ class SnapshotCheckoutHandler:
         consistent_with_migration_table = latest.consistent_state
         if not consistent_with_migration_table and not force:
             raise SnapshotHandlerException(
-                'Migration state is inconsistent latest applied '
-                'snapshot do not has all currently applied migrations. '
-                'Please use --force flag to checkout anyway.'
+                "Migration state is inconsistent latest applied "
+                "snapshot do not has all currently applied migrations. "
+                "Please use --force flag to checkout anyway."
             )
         if not consistent_with_migration_table:
-            self._write_to_output('Force to apply migration. Unsaved changes will be dropped')
+            self._write_to_output(
+                "Force to apply migration. Unsaved changes will be dropped"
+            )
 
         # eq is not same as equal snapshot.id == latest.id
         # see liquidb.models.Snapshot.__eq__
@@ -88,26 +88,33 @@ class SnapshotCheckoutHandler:
         self._checkout_to_snapshot(self.snapshot)
         with transaction.atomic():
             latest.applied = False
-            latest.save(update_fields=['applied'])
+            latest.save(update_fields=["applied"])
 
             self.snapshot.applied = True
-            self.snapshot.save(update_fields=['applied'])
-        self._write_to_output(f'Checkout from snapshot "{latest.name}" to "{self.snapshot.name}"')
+            self.snapshot.save(update_fields=["applied"])
+        self._write_to_output(
+            f'Checkout from snapshot "{latest.name}" to "{self.snapshot.name}"'
+        )
 
 
-class SnapshotCreationHandler:
-
+class SnapshotCreationHandler:  # pylint: disable=too-few-public-methods
     def __init__(self, snapshot_name, overwrite):
         self.snapshot_name = snapshot_name
         self.overwrite = overwrite
         self.snapshot = None
 
-    def _create(self, snapshot, latest, ):
+    def _create(
+        self,
+        snapshot,
+        latest,
+    ):
         with transaction.atomic():
             if latest is not None:
                 latest.applied = False
-                latest.save(update_fields=['applied'])
-            migrations = get_latest_applied_migrations_qs(connection).only('id', 'app', 'name')
+                latest.save(update_fields=["applied"])
+            migrations = get_latest_applied_migrations_qs(connection).only(
+                "id", "app", "name"
+            )
             snapshot.applied = True
 
             if snapshot.id is not None:
@@ -125,14 +132,15 @@ class SnapshotCreationHandler:
                 )
                 for migration in migrations
             ]
-            MigrationState.objects.bulk_create(to_create, batch_size=1000, ignore_conflicts=True)
+            MigrationState.objects.bulk_create(
+                to_create, batch_size=1000, ignore_conflicts=True
+            )
 
     def create(self, dry_run=False) -> bool:
         exists = Snapshot.objects.filter(name=self.snapshot_name).exists()
         if exists and not self.overwrite:
             raise SnapshotHandlerException(
-                f'Snapshot with given name {self.snapshot_name} already exists.\n'
-                'Please use overwrite to execute it anyway',
+                f"Snapshot with given name {self.snapshot_name} already exists.\n",
             )
 
         if exists:

@@ -1,1 +1,1 @@
-SELF_NAME = 'liquidb'
+SELF_NAME = "liquidb"

@@ -144,6 +144,8 @@ disable=print-statement,
         missing-module-docstring,
         f-string-without-interpolation,
         django-not-configured,
+        missing-function-docstring,
+        no-self-use,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -426,7 +428,7 @@ good-names=i,
            k,
            ex,
            Run,
-           _
+           e,
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
