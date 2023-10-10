@@ -56,7 +56,7 @@ pytest = "^6.2.4"
 pytest-cov = { version = "^2.11.1", python = "^3.7.17" }
 pylint-django = "^2.5.3"
 mock = { version = "^4.0.3", python = "^3.7.17" }
-pytest-django = "^4.1.0"
+pytest-django = { version = "^4.1.0", python = "^3.7.17" }
 beautifulsoup4 = "^4.9.3"
 black = { version = "^21.5b0", python = "^3.7.17" }
 twine = { version = "^4.0.2", python = "^3.7.17" }
