@@ -14,7 +14,7 @@ Requirements
 
 Django Liquidb requires:
     * Django 2.2 or later;
-    * Python 3.6 or later.
+    * Python 3.7.17 or later.
 
 
 Getting It

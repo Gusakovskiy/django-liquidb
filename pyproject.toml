@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=40.9.0", "wheel"]
+requires = ["setuptools>=53.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
@@ -51,16 +51,15 @@ authors = ["Vitalii Gusakovskiy"]
 django = "^2.2"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.7.2"
-pytest = "^6.2.2"
-pytest-cov = "^2.11.1"
-setuptools = "^53.0.0"
-pylint-django = "^2.4.2"
-mock = "^4.0.3"
+pylint = "^3.0.1"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+pylint-django = "^2.5.3"
+mock = "^5.0.0"
 pytest-django = "^4.1.0"
 beautifulsoup4 = "^4.9.3"
-black = "^21.5b0"
-twine = "^3.4.0"
+black = "^23.9.1"
+twine = "^4.0.2"
 
 
 [tool.poetry.plugins."poetry-dynamic-versioning"]
