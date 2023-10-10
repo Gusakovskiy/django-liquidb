@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=40.9.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "django-liquidb"
+version = "0.2"
+description = "Liquidb is a Django app that simplifies migration management."
+long-description = "file: README.rst"
+authors = ["Vitalii Gusakovskiy"]
+url = "https://github.com/Gusakovskiy/django-liquidb"
+license = "BSD-3-Clause"
+license-file = "LICENSE.md"
+python = "^3.7.17 || ^3.8 || ^3.9 || ^3.10 || ^3.11"
+
+[tool.poetry.dependencies]
+django = "^2.2"
+pylint = "^2.7.2"
+pytest = "^6.2.2"
+pytest-cov = "^2.11.1"
+setuptools = "^53.0.0"
+pylint-django = "^2.4.2"
+mock = "^4.0.3"
+pytest-django = "^4.1.0"
+beautifulsoup4 = "^4.9.3"
+black = "^21.5b0"
+twine = "^3.4.0"
+
+
+
+[tool.poetry.plugins."poetry-dynamic-versioning"]
+version-file = "liquidb/__init__.py"
+
+[tool.poetry.metadata]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.0",
+    "Framework :: Django :: 3.1",
+    "Framework :: Django :: 3.2",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Database",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries"
+]
