@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry config virtualenvs.create true
-        poetry install
+        poetry install --with dev
     - name: Test with pytest
       run: |
         pytest
