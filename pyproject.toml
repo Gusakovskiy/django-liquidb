@@ -43,6 +43,8 @@ Repository =  "https://github.com/Gusakovskiy/django-liquidb"
 [tool.poetry]
 name = "django-liquidb"
 version = "0.3"
+description = "Liquidb is a Django app that simplifies migration management."
+authors = ["Vitalii Gusakovskiy"]
 
 
 [tool.poetry.dependencies]
