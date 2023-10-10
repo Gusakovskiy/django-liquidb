@@ -53,7 +53,7 @@ django = { version = "^2.2", python = "^3.7.17" }
 [tool.poetry.dev-dependencies]
 pylint = "^2.7.2"
 pytest = "^7.4.2"
-pytest-cov = "^4.1.0"
+pytest-cov = { version = "^3.1.0", python = "^3.7.17" }
 pylint-django = "^2.5.3"
 mock = { version = "^4.0.3", python = "^3.7.17" }
 pytest-django = "^4.1.0"
