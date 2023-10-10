@@ -51,7 +51,7 @@ authors = ["Vitalii Gusakovskiy"]
 python = "^3.7.17"
 django = "^2.2"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pylint = "^2.7.2"
 pytest = "^6.2.4"
 pytest-cov = "^2.11.1"
