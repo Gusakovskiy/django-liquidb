@@ -29,7 +29,7 @@ class Command(BaseLiquidbCommand):
         try:
             created = handler.create()
         except SnapshotHandlerException as e:
-            raise CommandError(e.error)
+            raise CommandError(e.error) from e
         if not created:
             self.stdout.write(
                 "All migrations saved in currently applied snapshot. Nothing to create"

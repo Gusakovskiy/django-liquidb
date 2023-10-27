@@ -18,7 +18,8 @@ from .settings import ADMIN_SNAPSHOT_ACTIONS
 
 
 class SnapshotAdminModelForm(ModelForm):
-    def _create_snapshot(self, name: str, dry_run: bool):  # pylint: disable=no-self-use
+    @staticmethod
+    def _create_snapshot(name: str, dry_run: bool):
         handler = SnapshotCreationHandler(
             name,
             False,
@@ -26,7 +27,7 @@ class SnapshotAdminModelForm(ModelForm):
         try:
             created = handler.create(dry_run=dry_run)
         except SnapshotHandlerException as error:
-            raise ValidationError(error.error, code="name")
+            raise ValidationError(error.error, code="name") from error
         if not created:
             raise ValidationError(
                 "All migrations saved in currently applied snapshot. Nothing to create",

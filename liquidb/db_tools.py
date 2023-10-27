@@ -46,7 +46,7 @@ class SnapshotCheckoutHandler:
         executor = MigrationExecutor(connection)
         try:
             _: ProjectState = executor.migrate(targets)
-        except KeyError:
+        except KeyError as error:
             # TODO check exact migration that missing
             message = "\n".join(
                 [
@@ -58,9 +58,9 @@ class SnapshotCheckoutHandler:
                 f"\nSome migrations are missing.\n"
                 f'Please make sure all migrations in snapshot: "{snapshot.name}";\n'
                 f"Are present in corresponding apps: \n{message}"
-            )
+            ) from error
         except NodeNotFoundError as error:
-            raise SnapshotHandlerException(error.message)
+            raise SnapshotHandlerException(error.message) from error
 
     @property
     def applied_snapshot_exists(self):
