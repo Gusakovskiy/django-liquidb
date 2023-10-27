@@ -22,7 +22,7 @@ class Command(BaseLiquidbRevertCommand):
         interactive = options["interactive"]
         if interactive:
             confirm = input(
-                f"""
+                """
                 You have requested to delete snapshot history with all migrations.
                 This action is IRREVERSIBLE.
                 Are you sure you want to do this?
@@ -37,5 +37,6 @@ class Command(BaseLiquidbRevertCommand):
             snapshots = models.get("liquidb.Snapshot", 0)
             migrations_states = models.get("liquidb.MigrationState", 0)
         self.stdout.write(
-            f"Successfully deleted history of {snapshots} snapshots and {migrations_states} migrations"
+            f"Successfully deleted history of {snapshots} "
+            f"snapshots and {migrations_states} migrations"
         )

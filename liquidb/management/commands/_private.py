@@ -5,8 +5,8 @@ from django.core.management import BaseCommand, CommandError
 from django.db import connection
 from django.db.migrations.recorder import MigrationRecorder
 
-from ...db_tools import SnapshotCheckoutHandler, SnapshotHandlerException
-from ...models import Snapshot, MigrationState, get_latest_applied_migrations_qs
+from liquidb.db_tools import SnapshotCheckoutHandler, SnapshotHandlerException
+from liquidb.models import Snapshot, MigrationState, get_latest_applied_migrations_qs
 
 
 class BaseLiquidbCommand(BaseCommand, metaclass=ABCMeta):
@@ -68,7 +68,7 @@ class BaseLiquidbRevertCommand(BaseLiquidbCommand, metaclass=ABCMeta):
         try:
             handler.checkout(force=force)
         except SnapshotHandlerException as e:
-            raise CommandError(e.error)
+            raise CommandError(e.error) from e
 
     @abstractmethod
     def _handle(self, *args, **options):

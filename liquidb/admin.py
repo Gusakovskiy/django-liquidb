@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.core.checks import messages
@@ -18,7 +18,8 @@ from .settings import ADMIN_SNAPSHOT_ACTIONS
 
 
 class SnapshotAdminModelForm(ModelForm):
-    def _create_snapshot(self, name: str, dry_run: bool):  # pylint: disable=no-self-use
+    @staticmethod
+    def _create_snapshot(name: str, dry_run: bool):
         handler = SnapshotCreationHandler(
             name,
             False,
@@ -26,7 +27,7 @@ class SnapshotAdminModelForm(ModelForm):
         try:
             created = handler.create(dry_run=dry_run)
         except SnapshotHandlerException as error:
-            raise ValidationError(error.error, code="name")
+            raise ValidationError(error.error, code="name") from error
         if not created:
             raise ValidationError(
                 "All migrations saved in currently applied snapshot. Nothing to create",
@@ -82,7 +83,6 @@ class StateInline(admin.StackedInline):
 
 @admin.register(Snapshot)
 class SnapshotAdminView(ModelAdmin):
-
     form = SnapshotAdminModelForm
     readonly_fields = (
         "created",
@@ -123,7 +123,7 @@ class SnapshotAdminView(ModelAdmin):
         custom_urls = []
         if ADMIN_SNAPSHOT_ACTIONS:
             custom_urls.append(
-                url(
+                re_path(
                     r"^(?P<snapshot_id>.+)/apply/$",
                     self.admin_site.admin_view(self.apply_snapshot),
                     name="apply_snapshot",

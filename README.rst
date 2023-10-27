@@ -13,8 +13,8 @@ Requirements
 ============
 
 Django Liquidb requires:
-    * Django 2.2 or later;
-    * Python 3.6 or later.
+    * Django 3.2 or later;
+    * Python 3.8 or later.
 
 
 Getting It
@@ -90,6 +90,43 @@ Open Source projects can always use more help. Fixing a problem, documenting a f
 translation in your language. If you have some time to spare and like to help us, here are the places to do so:
 
 - GitHub: https://github.com/Gusakovskiy/django-liquidb
+
+
+Development
+==========
+
+Generating dependencies
+-----------
+
+Main dependencies::
+
+    $ pip-compile --upgrade --resolver backtracking  --output-file requirements.txt pyproject.toml
+
+Dev dependencies::
+
+    $ pip-compile --upgrade --resolver backtracking --extra dev --output-file requirements-dev.txt pyproject.toml
+
+If you see error that you can't figure out try to add `--verbose` flag
+
+
+After generating dependencies remember to change `backports.zoneinfo==0.2.1` to `backports.zoneinfo;python_version<"3.9"`
+this dependency is not supported by Python >= 3.9, it should be deleted after support for those versions is ended.
+
+
+Configure environment
+-----------
+
+In you local machine create virtual environment and activate it or setup docker container and run command::
+
+    $ pip install -r requirements-dev.txt
+
+To run test::
+
+    $ pytest tests
+
+To run linting::
+
+    $ pylint --load-plugins=pylint_django --django-settings-module=liquidb.pylint_settings liquidb
 
 Support
 =======
