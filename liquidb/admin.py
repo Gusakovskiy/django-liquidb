@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.core.checks import messages
@@ -123,7 +123,7 @@ class SnapshotAdminView(ModelAdmin):
         custom_urls = []
         if ADMIN_SNAPSHOT_ACTIONS:
             custom_urls.append(
-                url(
+                re_path(
                     r"^(?P<snapshot_id>.+)/apply/$",
                     self.admin_site.admin_view(self.apply_snapshot),
                     name="apply_snapshot",
