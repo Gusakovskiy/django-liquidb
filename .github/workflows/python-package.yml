@@ -32,7 +32,7 @@ jobs:
         pytest
     - name: Analyze with pylint
       run: |
-        pylint --load-plugins pylint_django liquidb
+         pylint --load-plugins=pylint_django --django-settings-module=liquidb.pylint_settings liquidb
     - name: Analyze with black
       run: |
         black --check .
