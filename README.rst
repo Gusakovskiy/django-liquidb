@@ -91,6 +91,39 @@ translation in your language. If you have some time to spare and like to help us
 
 - GitHub: https://github.com/Gusakovskiy/django-liquidb
 
+
+Development
+==========
+
+Generating dependencies
+-----------
+
+Main dependencies::
+
+    $ pip-compile --upgrade --resolver backtracking --generate-hashes --allow-unsafe --output-file requirements.txt pyproject.toml
+
+Dev dependencies::
+
+    $ pip-compile --upgrade --resolver backtracking --generate-hashes --allow-unsafe --extra dev --output-file requirements-dev.txt pyproject.toml
+
+If you see error that you can't figure out try to add `--verbose` flag
+
+
+Configure environment
+-----------
+
+In you local machine create virtual environment and activate it or setup docker container and run command::
+
+    $ pip install -r requirements-dev.txt
+
+To run test::
+
+    $ pytest tests
+
+To run linting::
+
+    $ pylint --load-plugins pylint_django liquidb
+
 Support
 =======
 
