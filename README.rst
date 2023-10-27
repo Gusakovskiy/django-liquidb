@@ -13,8 +13,8 @@ Requirements
 ============
 
 Django Liquidb requires:
-    * Django 2.2 or later;
-    * Python 3.7.17 or later.
+    * Django 3.2 or later;
+    * Python 3.8 or later.
 
 
 Getting It

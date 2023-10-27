@@ -3,21 +3,16 @@ name = "django-liquidb"
 version = "0.3"
 description = "Liquidb is a Django app that simplifies migration management."
 dependencies = [
-    "django>=2.2"
+    "django>=3.2"
 ]
-requires-python = ">=3.7.17"
+requires-python = ">=3.8"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
     "Framework :: Django",
-    "Framework :: Django :: 2.2",
-    "Framework :: Django :: 3.0",
-    "Framework :: Django :: 3.1",
-    "Framework :: Django :: 3.2",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
