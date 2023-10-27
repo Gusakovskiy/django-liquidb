@@ -100,11 +100,11 @@ Generating dependencies
 
 Main dependencies::
 
-    $ pip-compile --upgrade --resolver backtracking --generate-hashes --allow-unsafe --output-file requirements.txt pyproject.toml
+    $ pip-compile --upgrade --resolver backtracking  --output-file requirements.txt pyproject.toml
 
 Dev dependencies::
 
-    $ pip-compile --upgrade --resolver backtracking --generate-hashes --allow-unsafe --extra dev --output-file requirements-dev.txt pyproject.toml
+    $ pip-compile --upgrade --resolver backtracking --extra dev --output-file requirements-dev.txt pyproject.toml
 
 If you see error that you can't figure out try to add `--verbose` flag
 
