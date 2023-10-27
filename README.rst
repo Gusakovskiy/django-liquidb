@@ -110,7 +110,7 @@ If you see error that you can't figure out try to add `--verbose` flag
 
 
 After generating dependencies remember to change `backports.zoneinfo==0.2.1` to `backports.zoneinfo;python_version<"3.9"`
-this dependency is not supported by Python >= 3.9 gi
+this dependency is not supported by Python >= 3.9, it should be deleted after support for those versions is ended.
 
 
 Configure environment
