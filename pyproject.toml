@@ -1,17 +1,10 @@
-[build-system]
-requires = ["setuptools>=53.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-
 [project]
 name = "django-liquidb"
 version = "0.3"
 description = "Liquidb is a Django app that simplifies migration management."
-long-description = "file: README.rst"
-authors = [
-    {name = "Vitalii Gusakovskiy"},
+dependencies = [
+    "django>=2.2"
 ]
-license = {file = "LICENSE.md"}
 requires-python = ">=3.7.17"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -34,34 +27,28 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries"
 ]
-
+authors = [
+  {name = "Vitalii Gusakovskiy"}
+]
 
 [project.urls]
 Repository =  "https://github.com/Gusakovskiy/django-liquidb"
 
+[project.optional-dependencies]
+dev = [
+    "pylint>=2.7.2",
+    "pytest>=6.2.4",
+    "pytest-cov>=2.11.1",
+    "pylint-django>=2.5.3",
+    "mock>=4.0.3",
+    "pytest-django>=4.1.0",
+    "beautifulsoup4>=4.9.3",
+    "black>=21.5b0",
+    "twine>=4.0.2",
+    "twine",
+    "pip-tools"
+]
 
-[tool.poetry]
-name = "django-liquidb"
-version = "0.3"
-description = "Liquidb is a Django app that simplifies migration management."
-authors = ["Vitalii Gusakovskiy"]
-
-
-[tool.poetry.dependencies]
-python = "^3.7.17"
-django = "^2.2"
-
-[tool.poetry.group.dev.dependencies]
-pylint = "^2.7.2"
-pytest = "^6.2.4"
-pytest-cov = "^2.11.1"
-pylint-django = "^2.5.3"
-mock = "^4.0.3"
-pytest-django = "^4.1.0"
-beautifulsoup4 = "^4.9.3"
-black = "^21.5b0"
-twine = "^4.0.2"
-
-
-[tool.poetry.plugins."poetry-dynamic-versioning"]
-version-file = "liquidb/__init__.py"
+[build-system]
+requires = ["setuptools>=67.7.0", "wheel"]
+build-backend = "setuptools.build_meta"
