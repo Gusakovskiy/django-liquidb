@@ -83,7 +83,6 @@ class StateInline(admin.StackedInline):
 
 @admin.register(Snapshot)
 class SnapshotAdminView(ModelAdmin):
-
     form = SnapshotAdminModelForm
     readonly_fields = (
         "created",

@@ -93,11 +93,18 @@ def test_changelist_snapshot_not_empty(
     apps = [("first_app", "0001"), ("second_app", "0005")]
     _snapshot = create_snapshot_fixture(apps, "init")
     url = reverse("admin:liquidb_snapshot_changelist")
-    response = client.get(url,  follow=True)
+    response = client.get(url, follow=True)
     assert response.status_code == 200
 
     soup = BeautifulSoup(response.rendered_content, "html.parser")
-    assert len(soup.find_all("a", class_="addlink", href="/admin/liquidb/snapshot/add/", string="Add")) == 1
+    assert (
+        len(
+            soup.find_all(
+                "a", class_="addlink", href="/admin/liquidb/snapshot/add/", string="Add"
+            )
+        )
+        == 1
+    )
 
 
 @pytest.mark.django_db
