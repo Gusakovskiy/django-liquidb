@@ -31,15 +31,15 @@ Repository =  "https://github.com/Gusakovskiy/django-liquidb"
 
 [project.optional-dependencies]
 dev = [
-    "pylint>=2.7.2",
-    "pytest>=6.2.4",
-    "pytest-cov>=2.11.1",
-    "pylint-django>=2.5.3",
-    "mock>=4.0.3",
-    "pytest-django>=4.1.0",
-    "beautifulsoup4>=4.9.3",
-    "black>=21.5b0",
-    "twine>=4.0.2",
+    "pylint",
+    "pytest",
+    "pytest-cov",
+    "pylint-django",
+    "mock",
+    "pytest-django",
+    "beautifulsoup4",
+    "black",
+    "twine",
     "twine",
     "pip-tools"
 ]

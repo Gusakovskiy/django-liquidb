@@ -8,7 +8,7 @@ asgiref==3.7.2
     # via django
 astroid==3.0.1
     # via pylint
-backports.zoneinfo;python_version<"3.9"
+backports.zoneinfo;python_version<"3.9
     # via django
 beautifulsoup4==4.12.2
     # via django-liquidb (pyproject.toml)
