@@ -122,7 +122,7 @@ To run test::
 
 To run linting::
 
-    $ pylint --load-plugins pylint_django liquidb
+    $ pylint --load-plugins=pylint_django --django-settings-module=liquidb.pylint_settings liquidb
 
 Support
 =======
