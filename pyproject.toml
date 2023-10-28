@@ -1,7 +1,8 @@
 [project]
 name = "django-liquidb"
-version = "0.3"
+version = "0.4"
 description = "Liquidb is a Django app that simplifies migration management."
+readme = "README.rst"
 dependencies = [
     "django>=3.2"
 ]
@@ -28,6 +29,7 @@ authors = [
 
 [project.urls]
 Repository =  "https://github.com/Gusakovskiy/django-liquidb"
+Source = "https://pypi.org/project/django-liquidb/"
 
 [project.optional-dependencies]
 dev = [
@@ -40,7 +42,7 @@ dev = [
     "beautifulsoup4",
     "black",
     "twine",
-    "twine",
+    "build",
     "pip-tools"
 ]
 
