@@ -42,7 +42,7 @@ dev = [
     "beautifulsoup4",
     "black",
     "twine",
-    "twine",
+    "build",
     "pip-tools"
 ]
 
