@@ -6,6 +6,8 @@ dist/
 *.egg-info/
 venv/
 usefull_commands.sh
+.venv/
+env/
 .pypirc
 
 # PyCharm
