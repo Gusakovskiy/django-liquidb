@@ -2,7 +2,7 @@
 name = "django-liquidb"
 version = "0.4"
 description = "Liquidb is a Django app that simplifies migration management."
-readme = "README.rst"
+readme = "README.md"
 dependencies = [
     "django>=3.2"
 ]
